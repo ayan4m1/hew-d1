@@ -14,6 +14,7 @@
 #define LED_BRIGHTNESS 0x08
 
 #define HTTP_TIMEOUT_MS 2e3
+#define HTTP_PORT 80
 
 struct Settings {
   uint32_t color;
@@ -98,7 +99,7 @@ void setup() {
   pixels->fill(black);
   pixels->show();
 
-  api = new WiFiServer(80);
+  api = new WiFiServer(HTTP_PORT);
   api->begin();
 
   EEPROM.begin(sizeof(Settings));
