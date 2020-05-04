@@ -2,10 +2,12 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include <ESP_EEPROM.h>
 
 #define WIFI_AP "bar"
 #define WIFI_PSK "wi9NNYara"
+#define DEVICE_IDENTIFIER "puck-a"
 
 #define PACKET_SIZE JSON_OBJECT_SIZE(4) + 10
 
@@ -15,6 +17,8 @@
 
 #define HTTP_TIMEOUT_MS 2e3
 #define HTTP_PORT 80
+#define HTTP_SERVICE "http"
+#define HTTP_PROTOCOL "tcp"
 
 struct Settings {
   uint32_t color;
@@ -92,6 +96,15 @@ void setup() {
   // turn off built-in LED
   pinMode(LED_BUILTIN, LOW);
 
+  // set up WiFi radio
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
+  WiFi.hostname(DEVICE_IDENTIFIER);
+
+  // set up MDNS
+  MDNS.begin(DEVICE_IDENTIFIER);
+  MDNS.addService(HTTP_SERVICE, HTTP_PROTOCOL, HTTP_PORT);
+
+  // init LEDs
   pixels = new Adafruit_NeoPixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
   pixels->begin();
   pixels->setBrightness(LED_BRIGHTNESS);
@@ -99,9 +112,11 @@ void setup() {
   pixels->fill(black);
   pixels->show();
 
+  // init HTTP
   api = new WiFiServer(HTTP_PORT);
   api->begin();
 
+  // init settings from EEPROM
   EEPROM.begin(sizeof(Settings));
 
   if (EEPROM.percentUsed() >= 0) {
@@ -122,6 +137,8 @@ void loop() {
   if (!checkWiFi()) {
     return blinkDeath();
   }
+
+  MDNS.update();
 
   WiFiClient client = api->available();
 
