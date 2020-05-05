@@ -20,6 +20,14 @@
 #define HTTP_SERVICE "http"
 #define HTTP_PROTOCOL "tcp"
 
+#define RESPONSE_OK F("HTTP/1.1 200 OK")
+#define RESPONSE_BAD_REQUEST F("HTTP/1.1 400 Bad Request")
+#define RESPONSE_INTERNAL_SERVER_ERROR F("HTTP/1.1 500 Internal Server Error")
+#define HEADER_ACCESS_CONTROL_ALLOW_ORIGIN F("Access-Control-Allow-Origin: *")
+#define HEADER_ACCESS_CONTROL_ALLOW_HEADERS F("Access-Control-Allow-Headers: content-type")
+#define HEADER_CONNECTION F("Connection: close")
+#define HEADER_CONTENT_TYPE F("Content-type: application/json")
+
 struct Settings {
   uint32_t color;
   uint8_t brightness;
@@ -149,72 +157,88 @@ void loop() {
   uint32_t currentTime = millis();
   uint32_t lastTime = currentTime;
 
-  while (client.connected() && (currentTime - lastTime) <= HTTP_TIMEOUT_MS) {
-    currentTime = millis();
+  String request;
+  StaticJsonDocument<PACKET_SIZE> doc;
 
-    String request;
-    StaticJsonDocument<PACKET_SIZE> doc;
+  if (client.available()) {
+    request = client.readStringUntil('\n');
 
-    if (client.available()) {
+    if (request.startsWith("OPTIONS")) {
+      client.println(RESPONSE_OK);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
+      client.println(HEADER_CONNECTION);
+      client.println();
+      client.println();
+      client.stop();
+      return;
+    } else if (!request.startsWith("POST")) {
+      // ensure this is a POST request
+      client.println(RESPONSE_BAD_REQUEST);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
+      client.println(HEADER_CONNECTION);
+      client.println();
+      client.println();
+      client.stop();
+      return;
+    }
+
+    // skip all the headers
+    // note: this is vulerable to DOS attacks
+    while ((currentTime - lastTime) <= HTTP_TIMEOUT_MS) {
+      currentTime = millis();
       request = client.readStringUntil('\n');
 
-      // ensure this is a POST request
-      if (!request.startsWith("POST")) {
-        client.println(F("HTTP/1.1 400 Bad Request"));
-        client.println(F("Connection: close"));
-        client.println();
-        client.println();
+      if (request.startsWith("{")) {
         break;
       }
+    }
 
-      // skip all the headers
-      // note: this is vulerable to DOS attacks
-      while (!request.startsWith("{") && (currentTime - lastTime) <= HTTP_TIMEOUT_MS) {
-        currentTime = millis();
-        request = client.readStringUntil('\n');
+    // try to deserialize the JSON
+    DeserializationError error = deserializeJson(doc, request);
+
+    if (error) {
+      client.println(RESPONSE_INTERNAL_SERVER_ERROR);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
+      client.println(HEADER_CONNECTION);
+      client.println();
+      client.println(error.c_str());
+      client.println();
+    } else {
+      const uint32_t newColor = pixels->Color(doc["r"], doc["g"], doc["b"]);
+      const uint8_t newBrightness = doc["br"];
+      boolean settingsChanged = false;
+
+      // sync settings if they have changed
+      if (settings.color != newColor) {
+        settings.color = newColor;
+        settingsChanged = true;
       }
 
-      // try to deserialize the JSON
-      DeserializationError error = deserializeJson(doc, request);
-
-      if (error) {
-        client.println(F("HTTP/1.1 500 Internal Server Error"));
-        client.println(F("Connection: close"));
-        client.println();
-        client.println(error.c_str());
-        client.println();
-      } else {
-        const uint32_t newColor = pixels->Color(doc["r"], doc["g"], doc["b"]);
-        const uint8_t newBrightness = doc["br"];
-        boolean settingsChanged = false;
-
-        // sync settings if they have changed
-        if (settings.color != newColor) {
-          settings.color = newColor;
-          settingsChanged = true;
-        }
-
-        if (settings.brightness != newBrightness) {
-          settings.brightness = newBrightness;
-          settingsChanged = true;
-        }
-
-        // update pixels and write new settings to EEPROM if necessary
-        if (settingsChanged) {
-          setPixels();
-
-          EEPROM.begin(sizeof(Settings));
-          EEPROM.put(0, settings);
-          EEPROM.commit();
-          EEPROM.end();
-        }
-
-        client.println(F("HTTP/1.1 200 OK"));
-        client.println(F("Content-type: application/json"));
-        client.println(F("Connection: close"));
-        client.println();
-        client.println();
+      if (settings.brightness != newBrightness) {
+        settings.brightness = newBrightness;
+        settingsChanged = true;
       }
+
+      // update pixels and write new settings to EEPROM if necessary
+      if (settingsChanged) {
+        setPixels();
+
+        EEPROM.begin(sizeof(Settings));
+        EEPROM.put(0, settings);
+        EEPROM.commit();
+        EEPROM.end();
+      }
+
+      client.println(RESPONSE_OK);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
+      client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
+      client.println(HEADER_CONTENT_TYPE);
+      client.println(HEADER_CONNECTION);
+      client.println();
+      client.println();
     }
   }
 
