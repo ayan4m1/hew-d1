@@ -94,7 +94,7 @@ void setPixels() {
 
 void setup() {
   // turn off built-in LED
-  pinMode(LED_BUILTIN, LOW);
+  pinMode(LED_BUILTIN, HIGH);
 
   // set up WiFi radio
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
