@@ -1,15 +1,43 @@
 #include "Web.h"
 
-Web::Web(uint16_t port, uint32_t timeoutMs) {
+Web::Web(uint16_t port, uint32_t timeoutMs, String passphrase) {
   config = WebConfig();
   config.port = port;
   config.timeoutMs = timeoutMs;
+  config.passphrase = passphrase;
 
   server = new WiFiServer(config.port);
 }
 
 void Web::init() {
   server->begin();
+}
+
+void Web::respond(String status, WiFiClient client) {
+  client.println(status);
+  client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
+  client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
+  client.println(HEADER_CONNECTION);
+  client.println();
+  client.println();
+
+  if (client.connected()) {
+    client.stop();
+  }
+}
+
+void Web::respond(String status, String response, WiFiClient client) {
+  client.println(status);
+  client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
+  client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
+  client.println(HEADER_CONNECTION);
+  client.println();
+  client.println(response);
+  client.println();
+
+  if (client.connected()) {
+    client.stop();
+  }
 }
 
 bool Web::poll(WebResponse* response) {
@@ -33,27 +61,10 @@ bool Web::poll(WebResponse* response) {
   request = client.readStringUntil('\n');
 
   if (request.startsWith("OPTIONS")) {
-    client.println(RESPONSE_OK);
-    client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
-    client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
-    client.println(HEADER_CONNECTION);
-    client.println();
-    client.println();
-    client.stop();
+    this->respond(RESPONSE_OK, client);
     return false;
   } else if (!request.startsWith("POST")) {
-    // ensure this is a POST request
-    client.println(RESPONSE_BAD_REQUEST);
-    client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
-    client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
-    client.println(HEADER_CONNECTION);
-    client.println();
-    client.println();
-
-    if (client.connected()) {
-      client.stop();
-    }
-
+    this->respond(RESPONSE_BAD_REQUEST, client);
     return false;
   }
 
@@ -68,32 +79,16 @@ bool Web::poll(WebResponse* response) {
   DeserializationError error = deserializeJson(doc, request);
 
   if (error) {
-    client.println(RESPONSE_INTERNAL_SERVER_ERROR);
-    client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
-    client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
-    client.println(HEADER_CONNECTION);
-    client.println();
-    client.println(error.c_str());
-    client.println();
-
-    if (client.connected()) {
-      client.stop();
-    }
-
+    this->respond(RESPONSE_INTERNAL_SERVER_ERROR, error.c_str(), client);
     return false;
   }
 
-  client.println(RESPONSE_OK);
-  client.println(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
-  client.println(HEADER_ACCESS_CONTROL_ALLOW_HEADERS);
-  client.println(HEADER_CONTENT_TYPE_JSON);
-  client.println(HEADER_CONNECTION);
-  client.println();
-  client.println();
-
-  if (client.connected()) {
-    client.stop();
+  if (doc["p"] != config.passphrase) {
+    this->respond(RESPONSE_UNAUTHORIZED, client);
+    return false;
   }
+
+  this->respond(RESPONSE_OK, client);
 
   response->brightness = doc["br"];
   response->red = doc["r"];
