@@ -21,7 +21,7 @@ void setup() {
       HEW_HTTP_PORT,
       HEW_WIFI_SSID,
       HEW_WIFI_PSK);
-  api = new Web(HEW_HTTP_PORT, HEW_HTTP_TIMEOUT_MS);
+  api = new Web(HEW_HTTP_PORT, HEW_HTTP_TIMEOUT_MS, HEW_DEVICE_PASSPHRASE);
 
   light->init();
   deviceSettings = settings->init();
