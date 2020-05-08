@@ -21,7 +21,7 @@
 #define HEW_LED_COUNT 7
 
 // If your WiFi network is congested, you may need to increase this.
-#define HEW_HTTP_TIMEOUT_MS 2e3
+#define HEW_HTTP_TIMEOUT_MS 2000
 
 // You can customize the HTTP port by changing this value.
 #define HEW_HTTP_PORT 80
