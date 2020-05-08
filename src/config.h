@@ -1,3 +1,5 @@
+// REQUIRED
+
 // Change this to your Wireless SSID.
 #define HEW_WIFI_SSID "SSID"
 // Change this to your WPA2 PSK.
@@ -8,6 +10,8 @@
 
 // This passphrase is required to send commands to the device.
 #define HEW_DEVICE_PASSPHRASE "ChangeMe!"
+
+// OPTIONAL
 
 // Pin D4 on the D1 mini is the same as LED_BUILTIN, but they also
 // chose to use it as the default pin for this shield. If you want
