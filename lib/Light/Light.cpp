@@ -11,14 +11,14 @@ Light::Light(uint8_t ledCount, uint8_t ledPin) {
 /**
  * Start communicating with LEDs and turn them off.
  */
-void Light::init() {
+void Light::init(uint8_t brightness, uint32_t color) {
   // turn off built-in LED
   pinMode(LED_BUILTIN, HIGH);
 
   pixels->begin();
-  pixels->setBrightness(0);
+  pixels->setBrightness(brightness);
   pixels->show();
-  pixels->fill(pixels->Color(0, 0, 0));
+  pixels->fill(color);
   pixels->show();
 }
 
