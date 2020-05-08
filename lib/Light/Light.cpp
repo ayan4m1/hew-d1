@@ -1,10 +1,11 @@
 #include "Light.h"
 
 Light::Light(uint8_t ledCount, uint8_t ledPin) {
-  pixels = new Adafruit_NeoPixel(config.ledCount, config.ledPin, NEO_GRB + NEO_KHZ800);
   config = LightConfig();
   config.ledCount = ledCount;
   config.ledPin = ledPin;
+
+  pixels = new Adafruit_NeoPixel(config.ledCount, config.ledPin, NEO_GRB + NEO_KHZ800);
 }
 
 /**
