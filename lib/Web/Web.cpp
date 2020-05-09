@@ -1,5 +1,16 @@
 #include "Web.h"
 
+WebResponse::WebResponse() {
+  red = blue = green = brightness = 0;
+}
+
+WebResponse::WebResponse(uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
+  this->brightness = brightness;
+  this->red = red;
+  this->green = green;
+  this->blue = blue;
+}
+
 Web::Web(uint16_t port, uint32_t timeoutMs, String passphrase) {
   config = WebConfig();
   config.port = port;
@@ -99,10 +110,8 @@ bool Web::poll(WebResponse* response) {
 
   this->respond(RESPONSE_OK, client);
 
-  response->brightness = doc["br"];
-  response->red = doc["r"];
-  response->green = doc["g"];
-  response->blue = doc["b"];
+  *response = WebResponse(doc["br"], doc["r"], doc["g"], doc["b"]);
+
   Log::log("Got new device settings: (%d, %d, %d) %d",
            response->red,
            response->green,

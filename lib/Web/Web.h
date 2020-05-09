@@ -37,6 +37,9 @@ struct WebResponse {
   uint8_t red;
   uint8_t green;
   uint8_t blue;
+
+  WebResponse();
+  WebResponse(uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
 };
 
 class Web {
