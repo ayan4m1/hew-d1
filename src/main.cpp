@@ -14,6 +14,10 @@ Web* api;
 PersistedSettings deviceSettings;
 
 void setup() {
+#ifdef HEW_LOGGING
+  Log::init(HEW_LOGGING_BAUD_RATE);
+#endif
+
   light = new Light(HEW_LED_COUNT, HEW_LED_PIN);
   settings = new Settings();
   wireless = new Wireless(
@@ -50,6 +54,7 @@ void loop() {
 
     // update pixels and save new settings
     if (settingsChanged) {
+      Log::log("Settings have changed");
       light->update(deviceSettings.brightness, deviceSettings.color);
       settings->commit(deviceSettings);
     }

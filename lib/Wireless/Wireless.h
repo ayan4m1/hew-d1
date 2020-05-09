@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
+#include <Log.h>
 
 #define MDNS_SERVICE "http"
 #define MDNS_PROTOCOL "tcp"

@@ -9,6 +9,7 @@ Light::Light(uint8_t ledCount, uint8_t ledPin) {
   config.ledCount = ledCount;
   config.ledPin = ledPin;
 
+  Log::log("Configuring %d LEDs on pin %d", ledCount, ledPin);
   pixels = new CRGB[ledCount];
   FastLED.addLeds<CHIPSET, DATA_PIN, COLOR_ORDER>(pixels, ledCount)
       .setCorrection(TypicalLEDStrip);
@@ -33,9 +34,11 @@ void Light::init(uint8_t brightness, uint32_t color) {
  * Set all pixels to the saved brightness/color values.
  */
 void Light::update(uint8_t brightness, uint32_t color) {
+  Log::log("Setting brightness to %d", brightness);
   FastLED.setBrightness(brightness);
 
   // note: this code does not support > 256 LEDs
+  Log::log("Setting color to (%d, %d, %d)", parsed.r, parsed.g, parsed.b);
   for (uint8_t i = 0; i < config.ledCount; i++) {
     pixels[i] = CRGB(color);
   }

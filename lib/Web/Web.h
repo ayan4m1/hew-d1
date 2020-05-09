@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <ESP8266WebServer.h>
+#include <Log.h>
 
 // Hardcoded HTTP request/response strings
 #define RESPONSE_OK F("HTTP/1.1 200 OK")

@@ -10,6 +10,7 @@ Web::Web(uint16_t port, uint32_t timeoutMs, String passphrase) {
 }
 
 void Web::init() {
+  Log::log("Starting HTTP server...");
   server->begin();
 }
 
@@ -47,6 +48,8 @@ bool Web::poll(WebResponse* response) {
     return false;
   }
 
+  Log::log("Got an HTTP connection");
+
   uint32_t currentTime = millis();
   uint32_t lastTime = currentTime;
 
@@ -58,12 +61,16 @@ bool Web::poll(WebResponse* response) {
     delay(20);
   }
 
+  Log::log("Reading HTTP request");
+
   request = client.readStringUntil('\n');
 
   if (request.startsWith("OPTIONS")) {
+    Log::log("Handling pre-flight request");
     this->respond(RESPONSE_OK, client);
     return false;
   } else if (!request.startsWith("POST")) {
+    Log::log("Got a non-POST request!");
     this->respond(RESPONSE_BAD_REQUEST, client);
     return false;
   }
@@ -79,11 +86,13 @@ bool Web::poll(WebResponse* response) {
   DeserializationError error = deserializeJson(doc, request);
 
   if (error) {
+    Log::log("JSON deserialization failed: %s", error.c_str());
     this->respond(RESPONSE_INTERNAL_SERVER_ERROR, error.c_str(), client);
     return false;
   }
 
   if (doc["p"] != config.passphrase) {
+    Log::log("Invalid passphrase supplied!");
     this->respond(RESPONSE_UNAUTHORIZED, client);
     return false;
   }
@@ -94,5 +103,11 @@ bool Web::poll(WebResponse* response) {
   response->red = doc["r"];
   response->green = doc["g"];
   response->blue = doc["b"];
+  Log::log("Got new device settings: (%d, %d, %d) %d",
+           response->red,
+           response->green,
+           response->blue,
+           response->brightness);
+
   return true;
 }

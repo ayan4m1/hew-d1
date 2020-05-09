@@ -7,6 +7,8 @@ Wireless::Wireless(String deviceIdentifier, uint16_t httpPort, String ssid, Stri
   config.ssid = ssid;
   config.passphrase = passphrase;
 
+  Log::log("Configuring WiFi for SSID %s", ssid.c_str());
+  Log::log("Hostname is %s.local", deviceIdentifier.c_str());
   // set up WiFi radio
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.hostname(config.deviceIdentifier);
@@ -34,6 +36,8 @@ bool Wireless::connect() {
     return true;
   }
 
+  Log::log("Attempting WiFi connection...");
+
   // give it ten seconds
   uint16_t timeoutMs = 10000;
   // half a second per tick
@@ -59,6 +63,8 @@ bool Wireless::connect() {
  */
 void Wireless::poll() {
   if (!WiFi.isConnected()) {
+    Log::log("Lost WiFi connection, trying to reconnect...");
+
     bool blink = LOW;
     pinMode(LED_BUILTIN, OUTPUT);
     while (1) {
@@ -67,6 +73,7 @@ void Wireless::poll() {
 
       WiFi.reconnect();
       if (this->connect()) {
+        Log::log("Successfully reconnected to WiFi!");
         digitalWrite(LED_BUILTIN, LOW);
         break;
       }

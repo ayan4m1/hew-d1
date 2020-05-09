@@ -1,4 +1,5 @@
 #include <FastLED.h>
+#include <Log.h>
 
 struct LightConfig {
   uint8_t ledCount;
