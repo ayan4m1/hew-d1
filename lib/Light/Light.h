@@ -1,4 +1,4 @@
-#include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
 
 struct LightConfig {
   uint8_t ledCount;
@@ -6,7 +6,7 @@ struct LightConfig {
 };
 
 class Light {
-  Adafruit_NeoPixel* pixels;
+  CRGB* pixels;
   LightConfig config;
 
  public:
