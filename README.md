@@ -15,7 +15,7 @@ This project is an open source hardware implementation of end-user controllable 
 
 Install [PlatformIO](https://platformio.org/platformio-ide) for your favorite IDE. Then, use the [`platformio`](https://docs.platformio.org/en/latest/core/quickstart.html#process-project) command to build and upload the firmware to a D1 mini.
 
-### Configuration
+## Configuration
 
 Edit `src/config.h` before building/flashing the firmware.
 
@@ -25,3 +25,4 @@ Edit `src/config.h` before building/flashing the firmware.
 - Add Apple HomeKit / Alexa / Google Home integration
 - Support arbitrary-length panels/strands
 - Animations and gradients
+- TLS server support
