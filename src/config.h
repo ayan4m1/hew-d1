@@ -11,6 +11,12 @@
 // This passphrase is required to send commands to the device.
 #define HEW_DEVICE_PASSPHRASE "ChangeMe!"
 
+// Uncomment the line below to enable serial debugging.
+// #define HEW_LOGGING
+
+// Change the serial baud rate if necessary.
+#define HEW_LOGGING_BAUD_RATE 115200
+
 // OPTIONAL
 
 // Pin D4 on the D1 mini is the same as LED_BUILTIN, but they also
