@@ -9,13 +9,14 @@ Wireless::Wireless(String deviceIdentifier, uint16_t httpPort, String ssid, Stri
 
   Log::log("Configuring WiFi for SSID %s", ssid.c_str());
   Log::log("Hostname is %s.local", deviceIdentifier.c_str());
+
   // set up WiFi radio
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
-  WiFi.hostname(config.deviceIdentifier);
+  WiFi.hostname(deviceIdentifier);
 
   // set up MDNS
-  MDNS.begin(config.deviceIdentifier);
-  MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, config.httpPort);
+  MDNS.begin(deviceIdentifier);
+  MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, httpPort);
 }
 
 Wireless::~Wireless() {
