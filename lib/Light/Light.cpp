@@ -1,9 +1,5 @@
 #include "Light.h"
 
-#define CHIPSET WS2812
-#define DATA_PIN D4
-#define COLOR_ORDER GRB
-
 Light::Light(uint8_t ledCount, uint8_t ledPin) {
   config = LightConfig();
   config.ledCount = ledCount;
@@ -11,7 +7,7 @@ Light::Light(uint8_t ledCount, uint8_t ledPin) {
 
   Log::log("Configuring %d LEDs on pin %d", ledCount, ledPin);
   pixels = new CRGB[ledCount];
-  FastLED.addLeds<CHIPSET, DATA_PIN, COLOR_ORDER>(pixels, ledCount)
+  FastLED.addLeds<WS2812B, D4, GRB>(pixels, ledCount)
       .setCorrection(TypicalLEDStrip);
 }
 
@@ -22,12 +18,7 @@ void Light::init(uint8_t brightness, uint32_t color) {
   // turn off built-in LED
   pinMode(LED_BUILTIN, HIGH);
 
-  FastLED.setBrightness(brightness);
-  for (uint8_t i = 0; i < config.ledCount; i++) {
-    pixels[i] = CRGB(color);
-  }
-
-  FastLED.show();
+  update(brightness, color);
 }
 
 /**
@@ -37,15 +28,15 @@ void Light::update(uint8_t brightness, uint32_t color) {
   Log::log("Setting brightness to %d", brightness);
   FastLED.setBrightness(brightness);
 
-  // note: this code does not support > 256 LEDs
+  CRGB parsed = CRGB(color);
   Log::log("Setting color to (%d, %d, %d)", parsed.r, parsed.g, parsed.b);
   for (uint8_t i = 0; i < config.ledCount; i++) {
-    pixels[i] = CRGB(color);
+    pixels[i] = CRGB(parsed);
   }
 
   FastLED.show();
 }
 
 uint32_t Light::getColor(uint8_t r, uint8_t g, uint8_t b) {
-  return CRGB(r, g, b);
+  return (r << 16) + (g << 8) + b;
 }
