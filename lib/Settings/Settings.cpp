@@ -8,6 +8,7 @@ PersistedSettings Settings::init() {
     Log::log("Loading device settings from EEPROM");
     EEPROM.get(0, config);
   } else {
+    config.pattern = 1;
     config.color = 0;
     config.brightness = 0;
 

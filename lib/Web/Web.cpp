@@ -4,7 +4,8 @@ WebResponse::WebResponse() {
   red = blue = green = brightness = 0;
 }
 
-WebResponse::WebResponse(uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
+WebResponse::WebResponse(String pattern, uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
+  this->pattern = pattern;
   this->brightness = brightness;
   this->red = red;
   this->green = green;
@@ -90,6 +91,16 @@ bool Web::poll(WebResponse* response) {
   // note: this is vulerable to DOS attacks
   while (!request.startsWith("{") && (currentTime - lastTime) <= config.timeoutMs) {
     currentTime = millis();
+
+    // check for valid auth header
+    if (request.startsWith("Authorization: ")) {
+      if (!request.startsWith("Authorization: " + config.passphrase)) {
+        Log::log("Invalid passphrase supplied!");
+        this->respond(RESPONSE_UNAUTHORIZED, client);
+        return false;
+      }
+    }
+
     request = client.readStringUntil('\n');
   }
 
@@ -102,17 +113,12 @@ bool Web::poll(WebResponse* response) {
     return false;
   }
 
-  if (doc["p"] != config.passphrase) {
-    Log::log("Invalid passphrase supplied!");
-    this->respond(RESPONSE_UNAUTHORIZED, client);
-    return false;
-  }
-
   this->respond(RESPONSE_OK, client);
 
-  *response = WebResponse(doc["br"], doc["r"], doc["g"], doc["b"]);
+  *response = WebResponse(doc["p"], doc["br"], doc["r"], doc["g"], doc["b"]);
 
-  Log::log("Got new device settings: (%d, %d, %d) %d",
+  Log::log("Got new device settings: %s (%d, %d, %d) %d",
+           response->pattern.c_str(),
            response->red,
            response->green,
            response->blue,

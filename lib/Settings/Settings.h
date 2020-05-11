@@ -3,6 +3,7 @@
 #include <Log.h>
 
 struct PersistedSettings {
+  uint8_t pattern;
   uint32_t color;
   uint8_t brightness;
 };

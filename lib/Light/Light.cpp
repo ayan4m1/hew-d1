@@ -1,42 +1,71 @@
 #include "Light.h"
 
+void IPattern::draw() {}
+
+void SolidPattern::draw() {
+  // Log::log("Setting color to (%d, %d, %d)", color.r, color.g, color.b);
+
+  for (uint8_t i = 0; i < light->config.ledCount; i++) {
+    light->setColor(i, CRGB(color));
+  }
+}
+
+void MarqueePattern::draw() {
+  Log::log("Marquee hue is %d, value is %d", lastHue, lastValue);
+  light->setColor(lastIndex, CHSV(lastHue, 255, lastValue));
+
+  if (direction) {
+    lastValue -= 8;
+    lastHue -= 16;
+  } else {
+    lastValue += 8;
+    lastHue += 16;
+  }
+
+  lastIndex++;
+
+  if (lastIndex == light->config.ledCount) {
+    lastIndex = 0;
+  }
+
+  if (lastValue == 255 || lastValue == 127) {
+    direction = !direction;
+  }
+}
+
 Light::Light(uint8_t ledCount, uint8_t ledPin) {
   config = LightConfig();
   config.ledCount = ledCount;
   config.ledPin = ledPin;
+  config.ledBrightness = 0;
 
   Log::log("Configuring %d LEDs on pin %d", ledCount, ledPin);
   pixels = new CRGB[ledCount];
-  FastLED.addLeds<WS2812B, D4, GRB>(pixels, ledCount)
-      .setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2812B, D4, GRB>(pixels, ledCount);
 }
 
-/**
- * Start communicating with LEDs and turn them off.
- */
-void Light::init(uint8_t brightness, uint32_t color) {
-  // turn off built-in LED
-  pinMode(LED_BUILTIN, HIGH);
-
-  update(brightness, color);
-}
-
-/**
- * Set all pixels to the saved brightness/color values.
- */
-void Light::update(uint8_t brightness, uint32_t color) {
-  Log::log("Setting brightness to %d", brightness);
-  FastLED.setBrightness(brightness);
-
-  CRGB parsed = CRGB(color);
-  Log::log("Setting color to (%d, %d, %d)", parsed.r, parsed.g, parsed.b);
-  for (uint8_t i = 0; i < config.ledCount; i++) {
-    pixels[i] = CRGB(parsed);
+void Light::show() {
+  if (config.pattern != NULL) {
+    config.pattern->draw();
   }
-
   FastLED.show();
+}
+
+void Light::changeBrightness(uint8_t brightness) {
+  Log::log("Setting brightness to %d", config.ledBrightness);
+  config.ledBrightness = brightness;
+  FastLED.setBrightness(config.ledBrightness);
+}
+
+void Light::changePattern(IPattern* pattern) {
+  Log::log("Changing pattern");
+  config.pattern = pattern;
 }
 
 uint32_t Light::getColor(uint8_t r, uint8_t g, uint8_t b) {
   return (r << 16) + (g << 8) + b;
+}
+
+void Light::setColor(uint8_t i, CRGB color) {
+  pixels[i] = color;
 }

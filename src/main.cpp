@@ -18,6 +18,9 @@ void setup() {
   Log::init(HEW_LOGGING_BAUD_RATE);
 #endif
 
+  // turn off built-in LED
+  pinMode(LED_BUILTIN, HIGH);
+
   light = new Light(HEW_LED_COUNT, HEW_LED_PIN);
   settings = new Settings();
   wireless = new Wireless(
@@ -28,34 +31,51 @@ void setup() {
   api = new Web(HEW_HTTP_PORT, HEW_HTTP_TIMEOUT_MS, HEW_DEVICE_PASSPHRASE);
 
   deviceSettings = settings->init();
-  light->init(deviceSettings.brightness, deviceSettings.color);
+  light->changeBrightness(deviceSettings.brightness);
+  if (deviceSettings.pattern == Solid) {
+    light->changePattern(new SolidPattern(light, deviceSettings.color));
+  } else if (deviceSettings.pattern == Marquee) {
+    light->changePattern(new MarqueePattern(light));
+  }
+  light->show();
   api->init();
 }
 
 void loop() {
   wireless->poll();
+  light->show();
 
   WebResponse response = WebResponse();
   if (api->poll(&response)) {
     const uint32_t newColor = light->getColor(response.red, response.green, response.blue);
     const uint8_t newBrightness = response.brightness;
+    const String newPattern = response.pattern;
     boolean settingsChanged = false;
 
-    // sync settings if they have changed
+    if (deviceSettings.brightness != newBrightness) {
+      deviceSettings.brightness = newBrightness;
+      light->changeBrightness(newBrightness);
+      settingsChanged = true;
+    }
+
     if (deviceSettings.color != newColor) {
       deviceSettings.color = newColor;
       settingsChanged = true;
     }
 
-    if (deviceSettings.brightness != newBrightness) {
-      deviceSettings.brightness = newBrightness;
+    if (deviceSettings.pattern != Solid && newPattern == "SOLID") {
+      deviceSettings.pattern = Solid;
+      light->changePattern(new SolidPattern(light, deviceSettings.color));
+      settingsChanged = true;
+    } else if (deviceSettings.pattern != Marquee && newPattern == "MARQUEE") {
+      deviceSettings.pattern = Marquee;
+      light->changePattern(new MarqueePattern(light));
       settingsChanged = true;
     }
 
     // update pixels and save new settings
     if (settingsChanged) {
       Log::log("Settings have changed");
-      light->update(deviceSettings.brightness, deviceSettings.color);
       settings->commit(deviceSettings);
     }
   }
