@@ -16,9 +16,19 @@ This project is an open source hardware implementation of end-user controllable 
 
 Install [PlatformIO](https://platformio.org/platformio-ide) for your favorite IDE. Then, use the [`platformio`](https://docs.platformio.org/en/latest/core/quickstart.html#process-project) command to build and upload the firmware to a D1 mini.
 
-## Configuration
+### Configuration
 
 Edit `src/config.h` before building/flashing the firmware.
+
+If you choose a device identifier of `puck-a`, then your device will be accessible at `http://puck-a.local` after it connects to WiFi. You can customize the HTTP port by editing `src/config.h`. You control it by sending a POST request to `/` with the following:
+
+- Header: `Authorization: passphrase`, where `passphrase` is the configured `DEVICE_PASSPHRASE`
+- Body: Raw JSON with the following keys
+  - **r** - the red component of the color, 0-255
+  - **g** - the green component of the color, 0-255
+  - **b** - the blue component of the color, 0-255
+  - **br** - the brightness of the lights, 0-255
+  - **p** - a pattern string, can be either `SOLID` or `MARQUEE`
 
 ## Roadmap
 
