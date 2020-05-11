@@ -7,6 +7,7 @@ This project is an open source hardware implementation of end-user controllable 
 ## Features
 
 - Control the color and brightness of LEDs via [Hew](https://github.com/ayan4m1/hew-web)
+- Solid color or animated patterns
 - Simple passphrase based authentication
 - Zeroconf/mDNS support
 - Configuration persisted in NVRAM between restarts
@@ -24,5 +25,5 @@ Edit `src/config.h` before building/flashing the firmware.
 - Overhaul HTTP request parsing
 - Add Apple HomeKit / Alexa / Google Home integration
 - Support arbitrary-length panels/strands
-- Animations and gradients
+- Configurable animations
 - TLS server support
