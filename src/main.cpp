@@ -32,7 +32,10 @@ void setup() {
       HEW_WIFI_PSK);
   api = new Web(HEW_HTTP_PORT, HEW_HTTP_TIMEOUT_MS, HEW_DEVICE_PASSPHRASE);
 
+  // load settings from NVRAM
   deviceSettings = settings->init();
+
+  // init light state based on settings
   light->changeBrightness(deviceSettings.brightness);
   if (deviceSettings.pattern == Solid) {
     light->changePattern(new SolidPattern(light, deviceSettings.color));
@@ -40,12 +43,14 @@ void setup() {
     light->changePattern(new MarqueePattern(light));
   }
   light->show();
+
+  // start listening over HTTP
   api->init();
 }
 
 void loop() {
+  // update wireless state
   wireless->poll();
-  light->show();
 
   WebResponse response = WebResponse();
   if (api->poll(&response)) {
@@ -81,4 +86,8 @@ void loop() {
       settings->commit(deviceSettings);
     }
   }
+
+  // update light state
+  light->show();
+  delay(50);
 }
