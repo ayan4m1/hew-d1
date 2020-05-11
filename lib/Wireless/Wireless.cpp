@@ -75,7 +75,7 @@ void Wireless::poll() {
       WiFi.reconnect();
       if (this->connect()) {
         Log::log("Successfully reconnected to WiFi!");
-        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(LED_BUILTIN, HIGH);
         break;
       }
     }
