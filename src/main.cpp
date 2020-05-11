@@ -19,8 +19,10 @@ void setup() {
 #endif
 
   // turn off built-in LED
-  pinMode(LED_BUILTIN, HIGH);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 
+  // initialize objects with configuration
   light = new Light(HEW_LED_COUNT, HEW_LED_PIN);
   settings = new Settings();
   wireless = new Wireless(

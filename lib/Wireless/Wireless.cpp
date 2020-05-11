@@ -67,7 +67,6 @@ void Wireless::poll() {
     Log::log("Lost WiFi connection, trying to reconnect...");
 
     bool blink = LOW;
-    pinMode(LED_BUILTIN, OUTPUT);
     while (1) {
       digitalWrite(LED_BUILTIN, blink);
       blink = !blink;
@@ -75,7 +74,7 @@ void Wireless::poll() {
       WiFi.reconnect();
       if (this->connect()) {
         Log::log("Successfully reconnected to WiFi!");
-        digitalWrite(LED_BUILTIN, HIGH);
+        digitalWrite(LED_BUILTIN, LOW);
         break;
       }
     }
