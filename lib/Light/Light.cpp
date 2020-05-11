@@ -11,15 +11,13 @@ void SolidPattern::draw() {
 }
 
 void MarqueePattern::draw() {
-  Log::log("Marquee hue is %d, value is %d", lastHue, lastValue);
-  light->setColor(lastIndex, CHSV(lastHue, 255, lastValue));
+  Log::log("Marquee hue is %d, value is %d", lastHue);
+  light->setColor(lastIndex, CHSV(lastHue, 255, 200));
 
   if (direction) {
-    lastValue -= 8;
-    lastHue -= 16;
+    lastHue -= 4;
   } else {
-    lastValue += 8;
-    lastHue += 16;
+    lastHue += 4;
   }
 
   lastIndex++;
@@ -28,7 +26,7 @@ void MarqueePattern::draw() {
     lastIndex = 0;
   }
 
-  if (lastValue == 255 || lastValue == 127) {
+  if (lastHue == 0 || lastHue == 0xFF) {
     direction = !direction;
   }
 }

@@ -37,7 +37,6 @@ struct MarqueePattern : IPattern {
 
  private:
   bool direction = false;
-  uint8_t lastValue = 127;
   uint8_t lastHue = 0;
   uint8_t lastIndex = 0;
 };
