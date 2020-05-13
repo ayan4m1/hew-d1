@@ -24,16 +24,18 @@ If you choose a device identifier of `puck-a`, then your device will be accessib
 
 - Header: `Authorization: passphrase`, where `passphrase` is the configured `DEVICE_PASSPHRASE`
 - Body: Raw JSON with the following keys
-  - **r** - the red component of the color, 0-255
-  - **g** - the green component of the color, 0-255
-  - **b** - the blue component of the color, 0-255
-  - **br** - the brightness of the lights, 0-255
-  - **p** - a pattern string, can be either `SOLID` or `MARQUEE`
+  - **startColor** - hex string representing start color e.g. `ff0000`
+  - **endColor** - hex string representing end color e.g. `0000ff`
+  - **speed** - the animation speed, 0-255
+  - **brightness** - the brightness of the lights, 0-255
+  - **pattern** - a pattern string
+    - `SOLID` - only uses startColor, no animation
+    - `GRADIENT` - interpolate all LEDs between startColor and endColor
+    - `MARQUEE` - interpolate marching LED between startColor and endColor
 
 ## Roadmap
 
 - Overhaul HTTP request parsing
 - Add Apple HomeKit / Alexa / Google Home integration
 - Support arbitrary-length panels/strands
-- Configurable animations
 - TLS server support
