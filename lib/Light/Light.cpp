@@ -60,10 +60,10 @@ void Light::changePattern(IPattern* pattern) {
   config.pattern = pattern;
 }
 
-uint32_t Light::getColor(uint8_t r, uint8_t g, uint8_t b) {
-  return (r << 16) + (g << 8) + b;
-}
-
 void Light::setColor(uint8_t i, CRGB color) {
   pixels[i] = color;
+}
+
+void Light::setColor(CRGB color) {
+  fill_solid(pixels, config.ledCount, color);
 }

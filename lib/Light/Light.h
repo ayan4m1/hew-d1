@@ -58,6 +58,6 @@ struct Light {
   void changeBrightness(uint8_t brightness);
   void changePattern(IPattern* pattern);
   void show();
-  uint32_t getColor(uint8_t r, uint8_t g, uint8_t b);
   void setColor(uint8_t i, CRGB color);
+  void setColor(CRGB color);
 };
