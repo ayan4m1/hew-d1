@@ -38,9 +38,11 @@ void setup() {
   // init light state based on settings
   light->changeBrightness(deviceSettings.brightness);
   if (deviceSettings.pattern == Solid) {
-    light->changePattern(new SolidPattern(light, deviceSettings.color));
+    light->changePattern(new SolidPattern(light, deviceSettings.startColor));
+  } else if (deviceSettings.pattern == Gradient) {
+    light->changePattern(new GradientPattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
   } else if (deviceSettings.pattern == Marquee) {
-    light->changePattern(new MarqueePattern(light));
+    light->changePattern(new MarqueePattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
   }
   light->show();
 
@@ -54,29 +56,40 @@ void loop() {
 
   WebResponse response = WebResponse();
   if (api->poll(&response)) {
-    const uint32_t newColor = light->getColor(response.red, response.green, response.blue);
-    const uint8_t newBrightness = response.brightness;
-    const String newPattern = response.pattern;
     boolean settingsChanged = false;
 
-    if (deviceSettings.brightness != newBrightness) {
-      deviceSettings.brightness = newBrightness;
-      light->changeBrightness(newBrightness);
+    if (deviceSettings.brightness != response.brightness) {
+      deviceSettings.brightness = response.brightness;
+      light->changeBrightness(response.brightness);
       settingsChanged = true;
     }
 
-    if (deviceSettings.color != newColor) {
-      deviceSettings.color = newColor;
+    if (deviceSettings.startColor != response.startColor) {
+      deviceSettings.startColor = response.startColor;
       settingsChanged = true;
     }
 
-    if (deviceSettings.pattern != Solid && newPattern == "SOLID") {
+    if (deviceSettings.endColor != response.endColor) {
+      deviceSettings.endColor = response.endColor;
+      settingsChanged = true;
+    }
+
+    if (deviceSettings.speed != response.speed) {
+      deviceSettings.speed = response.speed;
+      settingsChanged = true;
+    }
+
+    if (response.pattern == "SOLID") {
       deviceSettings.pattern = Solid;
-      light->changePattern(new SolidPattern(light, deviceSettings.color));
+      light->changePattern(new SolidPattern(light, deviceSettings.startColor));
       settingsChanged = true;
-    } else if (deviceSettings.pattern != Marquee && newPattern == "MARQUEE") {
+    } else if (response.pattern == "GRADIENT") {
+      deviceSettings.pattern = Gradient;
+      light->changePattern(new GradientPattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
+      settingsChanged = true;
+    } else if (response.pattern == "MARQUEE") {
       deviceSettings.pattern = Marquee;
-      light->changePattern(new MarqueePattern(light));
+      light->changePattern(new MarqueePattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
       settingsChanged = true;
     }
 
@@ -87,7 +100,8 @@ void loop() {
     }
   }
 
-  // update light state
-  light->show();
-  delay(50);
+  // update light state at 120Hz
+  EVERY_N_MILLISECONDS(8) {
+    light->show();
+  }
 }

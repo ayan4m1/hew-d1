@@ -4,8 +4,10 @@
 
 struct PersistedSettings {
   uint8_t pattern;
-  uint32_t color;
+  uint32_t startColor;
+  uint32_t endColor;
   uint8_t brightness;
+  uint8_t speed;
 };
 
 class Settings {

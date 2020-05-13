@@ -1,15 +1,16 @@
 #include "Web.h"
 
 WebResponse::WebResponse() {
-  red = blue = green = brightness = 0;
+  pattern = "";
+  startColor = endColor = brightness = 0;
 }
 
-WebResponse::WebResponse(String pattern, uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
+WebResponse::WebResponse(String pattern, uint8_t brightness, String startColor, String endColor, uint8_t speed) {
   this->pattern = pattern;
   this->brightness = brightness;
-  this->red = red;
-  this->green = green;
-  this->blue = blue;
+  this->startColor = strtoul(startColor.c_str(), 0, 16);
+  this->endColor = strtoul(endColor.c_str(), 0, 16);
+  this->speed = speed;
 }
 
 Web::Web(uint16_t port, uint32_t timeoutMs, String passphrase) {
@@ -115,13 +116,17 @@ bool Web::poll(WebResponse* response) {
 
   this->respond(RESPONSE_OK, client);
 
-  *response = WebResponse(doc["p"], doc["br"], doc["r"], doc["g"], doc["b"]);
+  *response = WebResponse(
+      doc["pattern"],
+      doc["brightness"],
+      doc["startColor"],
+      doc["endColor"],
+      doc["speed"]);
 
-  Log::log("Got new device settings: %s (%d, %d, %d) %d",
+  Log::log("Pattern: %s Colors: %d to %d Brightness: %d",
            response->pattern.c_str(),
-           response->red,
-           response->green,
-           response->blue,
+           response->startColor,
+           response->endColor,
            response->brightness);
 
   return true;

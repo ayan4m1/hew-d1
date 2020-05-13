@@ -15,16 +15,17 @@
 #define HEADER_CONTENT_TYPE_JSON F("Content-type: application/json")
 
 // Calculated using https://arduinojson.org/v6/assistant/
-/**
- * {
- *   "r": 255,
- *   "g": 255,
- *   "b": 255,
- *   "br": 255,
- *   "p": "passphrase"
- * }
+/*
+  {
+    "pattern": "SOLID",
+    "startColor": "ff0000",
+    "endColor": "f0f0f0",
+    "brightness": 255,
+    "speed": 1,
+    "passphrase": "12312312311231231231123123123112"
+  }
  */
-#define JSON_PACKET_SIZE JSON_OBJECT_SIZE(5) + 50
+#define JSON_PACKET_SIZE JSON_OBJECT_SIZE(6) + 130
 
 struct WebConfig {
   uint16_t port;
@@ -35,12 +36,12 @@ struct WebConfig {
 struct WebResponse {
   String pattern;
   uint8_t brightness;
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
+  uint32_t startColor;
+  uint32_t endColor;
+  uint8_t speed;
 
   WebResponse();
-  WebResponse(String pattern, uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue);
+  WebResponse(String pattern, uint8_t brightness, String startColor, String endColor, uint8_t speed);
 };
 
 class Web {

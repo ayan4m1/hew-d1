@@ -9,7 +9,9 @@ PersistedSettings Settings::init() {
     EEPROM.get(0, config);
   } else {
     config.pattern = 1;
-    config.color = 0;
+    config.speed = 1;
+    config.startColor = 0;
+    config.endColor = 0;
     config.brightness = 0;
 
     Log::log("Writing new device settings to EEPROM");
