@@ -10,7 +10,7 @@
 #define RESPONSE_INTERNAL_SERVER_ERROR F("HTTP/1.1 500 Internal Server Error")
 
 #define HEADER_ACCESS_CONTROL_ALLOW_ORIGIN F("Access-Control-Allow-Origin: *")
-#define HEADER_ACCESS_CONTROL_ALLOW_HEADERS F("Access-Control-Allow-Headers: content-type")
+#define HEADER_ACCESS_CONTROL_ALLOW_HEADERS F("Access-Control-Allow-Headers: content-type, authorization")
 #define HEADER_CONNECTION F("Connection: close")
 #define HEADER_CONTENT_TYPE_JSON F("Content-type: application/json")
 
