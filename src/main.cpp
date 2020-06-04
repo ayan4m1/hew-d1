@@ -1,10 +1,9 @@
 #include <Arduino.h>
+#include <Config.h>
 #include <Light.h>
 #include <Settings.h>
 #include <Web.h>
 #include <Wireless.h>
-
-#include "config.h"
 
 Light* light;
 Settings* settings;

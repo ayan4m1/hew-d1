@@ -1,6 +1,6 @@
+#include <Config.h>
 #include <FastLED.h>
 #include <Log.h>
-#include <config.h>
 
 uint8_t getHue(CRGB color);
 

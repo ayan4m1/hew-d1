@@ -1,6 +1,6 @@
 #include <Arduino.h>
+#include <Config.h>
 #include <SPI.h>
-#include <config.h>
 
 #ifndef CLASS_LOG
 #define CLASS_LOG
