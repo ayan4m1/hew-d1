@@ -1,19 +1,30 @@
 #include "Light.h"
 
-uint8_t getHue(CRGB color) {
+CHSV getHSV(CRGB color) {
+  CHSV hsv;
   uint8_t minValue = min(color.r, min(color.g, color.b));
   uint8_t maxValue = max(color.r, max(color.g, color.b));
   uint8_t delta = maxValue - minValue;
 
   if (maxValue == color.r) {
-    return 43 * (color.g - color.b / (double)delta);
+    hsv.h = 43 * (color.g - color.b / (double)delta);
   } else if (maxValue == color.g) {
-    return 43 * (2 + (color.b - color.r) / (double)delta);
+    hsv.h = 43 * (2 + (color.b - color.r) / (double)delta);
   } else if (maxValue == color.b) {
-    return 43 * (4 + (color.r - color.g) / (double)delta);
+    hsv.h = 43 * (4 + (color.r - color.g) / (double)delta);
+  } else {
+    hsv.h = 0;
   }
 
-  return 0;
+  if (maxValue == 0) {
+    hsv.s = 0;
+  } else {
+    hsv.s = 0xFFU * (double)(delta / (double)maxValue);
+  }
+
+  hsv.v = maxValue;
+
+  return hsv;
 }
 
 void IPattern::draw() {}
@@ -24,14 +35,32 @@ void SolidPattern::draw() {
 }
 
 void MarqueePattern::draw() {
-  Log::log("Marquee hue is %d", lastHue);
-  light->setColor(lastIndex, CHSV(lastHue, 255, 200));
+  Log::log("Marquee HSV is %d %d %d", lastHue, lastSat, lastVal);
+  light->setColor(lastIndex, CHSV(lastHue, lastSat, lastVal));
   delay(40 / (speed / (double)128U));
 
-  if (!direction) {
-    lastHue++;
-  } else {
-    lastHue--;
+  if (maxHue - minHue > 0) {
+    if (!hueDirection) {
+      lastHue++;
+    } else {
+      lastHue--;
+    }
+  }
+
+  if (maxSat - minSat > 0) {
+    if (!satDirection) {
+      lastSat++;
+    } else {
+      lastSat--;
+    }
+  }
+
+  if (maxVal - minVal > 0) {
+    if (valDirection) {
+      lastVal++;
+    } else {
+      lastVal--;
+    }
   }
 
   lastIndex++;
@@ -41,7 +70,15 @@ void MarqueePattern::draw() {
   }
 
   if (lastHue == minHue || lastHue == maxHue) {
-    direction = !direction;
+    hueDirection = !hueDirection;
+  }
+
+  if (lastSat == minSat || lastSat == maxSat) {
+    satDirection = !satDirection;
+  }
+
+  if (lastVal == minVal || lastVal == maxVal) {
+    valDirection = !valDirection;
   }
 }
 
