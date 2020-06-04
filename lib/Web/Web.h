@@ -2,6 +2,7 @@
 #include <ArduinoJson.h>
 #include <ESP8266WebServer.h>
 #include <Log.h>
+#include <config.h>
 
 // Hardcoded HTTP request/response strings
 #define RESPONSE_OK F("HTTP/1.1 200 OK")
@@ -49,7 +50,7 @@ class Web {
   WiFiServer* server;
 
  public:
-  Web(uint16_t, uint32_t, String);
+  Web();
   void init();
   bool poll(WebResponse*);
 

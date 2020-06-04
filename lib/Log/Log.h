@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
+#include <config.h>
 
 #ifndef CLASS_LOG
 #define CLASS_LOG
@@ -8,7 +9,7 @@ class Log {
   static bool started;
 
  public:
-  static void init(uint32_t);
+  static void init();
   static void end();
   static void log(const char* format, ...);
 };

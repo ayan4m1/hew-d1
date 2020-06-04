@@ -2,8 +2,8 @@
 
 bool Log::started = false;
 
-void Log::init(uint32_t baudRate) {
-  Serial.begin(baudRate);
+void Log::init() {
+  Serial.begin(HEW_LOGGING_BAUD_RATE);
 
   while (!Serial) {
     delayMicroseconds(100);

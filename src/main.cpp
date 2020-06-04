@@ -15,22 +15,18 @@ PersistedSettings deviceSettings;
 
 void setup() {
 #ifdef HEW_LOGGING
-  Log::init(HEW_LOGGING_BAUD_RATE);
+  Log::init();
 #endif
 
   // turn off built-in LED
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  digitalWrite(LED_BUILTIN, HIGH);
 
   // initialize objects with configuration
-  light = new Light(HEW_LED_COUNT, HEW_LED_PIN);
+  light = new Light();
   settings = new Settings();
-  wireless = new Wireless(
-      HEW_DEVICE_IDENTIFIER,
-      HEW_HTTP_PORT,
-      HEW_WIFI_SSID,
-      HEW_WIFI_PSK);
-  api = new Web(HEW_HTTP_PORT, HEW_HTTP_TIMEOUT_MS, HEW_DEVICE_PASSPHRASE);
+  wireless = new Wireless();
+  api = new Web();
 
   // load settings from NVRAM
   deviceSettings = settings->init();

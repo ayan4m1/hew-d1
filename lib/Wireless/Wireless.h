@@ -2,6 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <Log.h>
+#include <config.h>
 
 #define MDNS_SERVICE "http"
 #define MDNS_PROTOCOL "tcp"
@@ -17,7 +18,7 @@ class Wireless {
   WirelessConfig config;
 
  public:
-  Wireless(String, uint16_t, String, String);
+  Wireless();
   ~Wireless();
   void poll();
 

@@ -1,22 +1,22 @@
 #include "Wireless.h"
 
-Wireless::Wireless(String deviceIdentifier, uint16_t httpPort, String ssid, String passphrase) {
+Wireless::Wireless() {
   config = WirelessConfig();
-  config.deviceIdentifier = deviceIdentifier;
-  config.httpPort = httpPort;
-  config.ssid = ssid;
-  config.passphrase = passphrase;
+  config.deviceIdentifier = HEW_DEVICE_IDENTIFIER;
+  config.httpPort = HEW_HTTP_PORT;
+  config.ssid = HEW_WIFI_SSID;
+  config.passphrase = HEW_WIFI_PSK;
 
-  Log::log("Configuring WiFi for SSID %s", ssid.c_str());
-  Log::log("Hostname is %s.local", deviceIdentifier.c_str());
+  Log::log("Configuring WiFi for SSID %s", config.ssid.c_str());
+  Log::log("Hostname is %s.local", config.passphrase.c_str());
 
   // set up WiFi radio
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
-  WiFi.hostname(deviceIdentifier);
+  WiFi.hostname(config.deviceIdentifier);
 
   // set up MDNS
-  MDNS.begin(deviceIdentifier);
-  MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, httpPort);
+  MDNS.begin(config.deviceIdentifier);
+  MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, config.httpPort);
 }
 
 Wireless::~Wireless() {
@@ -74,7 +74,7 @@ void Wireless::poll() {
       WiFi.reconnect();
       if (this->connect()) {
         Log::log("Successfully reconnected to WiFi!");
-        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(LED_BUILTIN, HIGH);
         break;
       }
     }

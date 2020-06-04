@@ -62,15 +62,15 @@ void GradientPattern::draw() {
   }
 }
 
-Light::Light(uint8_t ledCount, uint8_t ledPin) {
+Light::Light() {
   config = LightConfig();
-  config.ledCount = ledCount;
-  config.ledPin = ledPin;
+  config.ledCount = HEW_LED_COUNT;
+  config.ledPin = HEW_LED_PIN;
   config.ledBrightness = 0;
 
-  Log::log("Configuring %d LEDs on pin %d", ledCount, ledPin);
-  pixels = new CRGB[ledCount];
-  FastLED.addLeds<WS2812B, D4, GRB>(pixels, ledCount);
+  Log::log("Configuring %d LEDs on pin %d", config.ledCount, config.ledPin);
+  pixels = new CRGB[HEW_LED_COUNT];
+  FastLED.addLeds<WS2812B, HEW_LED_PIN, GRB>(pixels, HEW_LED_COUNT);
 }
 
 void Light::show() {

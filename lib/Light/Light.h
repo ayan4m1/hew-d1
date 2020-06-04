@@ -1,5 +1,6 @@
 #include <FastLED.h>
 #include <Log.h>
+#include <config.h>
 
 uint8_t getHue(CRGB color);
 
@@ -81,7 +82,7 @@ struct Light {
   CRGB* pixels;
   LightConfig config;
 
-  Light(uint8_t ledCount, uint8_t ledPin);
+  Light();
 
   void init(uint8_t brightness, uint32_t color);
   void changeBrightness(uint8_t brightness);

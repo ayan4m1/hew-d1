@@ -13,11 +13,11 @@ WebResponse::WebResponse(String pattern, uint8_t brightness, String startColor, 
   this->speed = speed;
 }
 
-Web::Web(uint16_t port, uint32_t timeoutMs, String passphrase) {
+Web::Web() {
   config = WebConfig();
-  config.port = port;
-  config.timeoutMs = timeoutMs;
-  config.passphrase = passphrase;
+  config.port = HEW_HTTP_PORT;
+  config.timeoutMs = HEW_HTTP_TIMEOUT_MS;
+  config.passphrase = HEW_DEVICE_PASSPHRASE;
 
   server = new WiFiServer(config.port);
 }
