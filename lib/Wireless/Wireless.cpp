@@ -8,7 +8,7 @@ Wireless::Wireless() {
   config.passphrase = HEW_WIFI_PSK;
 
   Log::log("Configuring WiFi for SSID %s", config.ssid.c_str());
-  Log::log("Hostname is %s.local", config.passphrase.c_str());
+  Log::log("Hostname is %s.local", config.deviceIdentifier.c_str());
 
   // set up WiFi radio
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
