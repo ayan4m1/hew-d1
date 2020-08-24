@@ -45,53 +45,58 @@ void setup() {
   api->init();
 }
 
+void handleResponse(WebResponse response) {
+  boolean settingsChanged = false;
+
+  if (deviceSettings.brightness != response.brightness) {
+    deviceSettings.brightness = response.brightness;
+    light->changeBrightness(response.brightness);
+    settingsChanged = true;
+  }
+
+  if (deviceSettings.startColor != response.startColor) {
+    deviceSettings.startColor = response.startColor;
+    settingsChanged = true;
+  }
+
+  if (deviceSettings.endColor != response.endColor) {
+    deviceSettings.endColor = response.endColor;
+    settingsChanged = true;
+  }
+
+  if (deviceSettings.speed != response.speed) {
+    deviceSettings.speed = response.speed;
+    settingsChanged = true;
+  }
+
+  if (response.pattern == "SOLID") {
+    deviceSettings.pattern = Solid;
+    light->changePattern(new SolidPattern(light, deviceSettings.startColor));
+    settingsChanged = true;
+  } else if (response.pattern == "GRADIENT") {
+    deviceSettings.pattern = Gradient;
+    light->changePattern(new GradientPattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
+    settingsChanged = true;
+  } else if (response.pattern == "MARQUEE") {
+    deviceSettings.pattern = Marquee;
+    light->changePattern(new MarqueePattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
+    settingsChanged = true;
+  }
+
+  // update pixels and save new settings
+  if (settingsChanged) {
+    Log::log("Settings have changed");
+    settings->commit(deviceSettings);
+  }
+}
+
 void loop() {
-  // update wireless state
   wireless->poll();
 
-  WebResponse response = WebResponse();
-  if (api->poll(&response)) {
-    boolean settingsChanged = false;
-
-    if (deviceSettings.brightness != response.brightness) {
-      deviceSettings.brightness = response.brightness;
-      light->changeBrightness(response.brightness);
-      settingsChanged = true;
-    }
-
-    if (deviceSettings.startColor != response.startColor) {
-      deviceSettings.startColor = response.startColor;
-      settingsChanged = true;
-    }
-
-    if (deviceSettings.endColor != response.endColor) {
-      deviceSettings.endColor = response.endColor;
-      settingsChanged = true;
-    }
-
-    if (deviceSettings.speed != response.speed) {
-      deviceSettings.speed = response.speed;
-      settingsChanged = true;
-    }
-
-    if (response.pattern == "SOLID") {
-      deviceSettings.pattern = Solid;
-      light->changePattern(new SolidPattern(light, deviceSettings.startColor));
-      settingsChanged = true;
-    } else if (response.pattern == "GRADIENT") {
-      deviceSettings.pattern = Gradient;
-      light->changePattern(new GradientPattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
-      settingsChanged = true;
-    } else if (response.pattern == "MARQUEE") {
-      deviceSettings.pattern = Marquee;
-      light->changePattern(new MarqueePattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
-      settingsChanged = true;
-    }
-
-    // update pixels and save new settings
-    if (settingsChanged) {
-      Log::log("Settings have changed");
-      settings->commit(deviceSettings);
+  EVERY_N_SECONDS(5) {
+    WebResponse response = WebResponse();
+    if (api->poll(&response)) {
+      handleResponse(response);
     }
   }
 
