@@ -27,7 +27,7 @@
 // by cutting the D4 jumper and bridging the gap between another pad
 // and the control line using solder. This keeps the built-in blue LED
 // off.
-#define HEW_LED_PIN D5
+#define HEW_LED_PIN D4
 
 // If you're using the RGB LED shield, leave this set to seven.
 #define HEW_LED_COUNT 7
