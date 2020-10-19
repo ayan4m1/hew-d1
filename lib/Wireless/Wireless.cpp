@@ -13,10 +13,6 @@ Wireless::Wireless() {
   // set up WiFi radio
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.hostname(config.deviceIdentifier);
-
-  // set up MDNS
-  MDNS.begin(config.deviceIdentifier);
-  MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, config.httpPort);
 }
 
 Wireless::~Wireless() {
@@ -55,6 +51,8 @@ bool Wireless::connect() {
     }
   }
 
+  Log::log("IP address is %s", WiFi.localIP().toString().c_str());
+
   return WiFi.status() == WL_CONNECTED;
 }
 
@@ -64,8 +62,6 @@ bool Wireless::connect() {
  */
 void Wireless::poll() {
   if (!WiFi.isConnected()) {
-    Log::log("Lost WiFi connection, trying to reconnect...");
-
     bool blink = LOW;
     while (1) {
       digitalWrite(LED_BUILTIN, blink);
@@ -73,7 +69,15 @@ void Wireless::poll() {
 
       WiFi.reconnect();
       if (this->connect()) {
-        Log::log("Successfully reconnected to WiFi!");
+        Log::log("Successfully connected to WiFi!");
+
+        // set up MDNS
+        if (!MDNS.begin(config.deviceIdentifier)) {
+          Log::log("Error initializing mDNS!");
+        }
+
+        MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, config.httpPort);
+
         digitalWrite(LED_BUILTIN, HIGH);
         break;
       }
