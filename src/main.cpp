@@ -93,11 +93,9 @@ void handleResponse(WebResponse response) {
 void loop() {
   wireless->poll();
 
-  EVERY_N_SECONDS(5) {
-    WebResponse response = WebResponse();
-    if (api->poll(&response)) {
-      handleResponse(response);
-    }
+  WebResponse response = WebResponse();
+  if (api->poll(&response)) {
+    handleResponse(response);
   }
 
   // update light state at 120Hz
