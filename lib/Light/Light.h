@@ -7,7 +7,8 @@ CHSV getHSV(CRGB color);
 enum Pattern : uint8_t {
   Solid = 1,
   Marquee = 2,
-  Gradient = 4
+  Gradient = 4,
+  Breathing = 8
 };
 
 class Light;
@@ -76,6 +77,25 @@ struct GradientPattern : IPattern {
   void draw();
 
  private:
+  bool direction = false;
+  CRGB startColor;
+  CRGB endColor;
+  uint16_t maximumSteps = 0;
+  uint16_t currentStep = 0;
+};
+
+struct BreathingPattern : IPattern {
+  BreathingPattern(Light* light, uint32_t startColor, uint8_t speed) : IPattern(light) {
+    this->startColor = CRGB(startColor);
+    CHSV endColor = getHSV(startColor);
+    endColor.v = 50;
+    this->endColor = endColor;
+    this->maximumSteps = 1024U * (128U / (double)speed);
+  }
+
+  void draw();
+
+private:
   bool direction = false;
   CRGB startColor;
   CRGB endColor;

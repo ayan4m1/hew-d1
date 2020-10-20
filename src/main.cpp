@@ -38,6 +38,8 @@ void setup() {
     light->changePattern(new GradientPattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
   } else if (deviceSettings.pattern == Marquee) {
     light->changePattern(new MarqueePattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
+  } else if (deviceSettings.pattern == Breathing) {
+    light->changePattern(new BreathingPattern(light, deviceSettings.startColor, deviceSettings.speed));
   }
   light->show();
 
@@ -80,6 +82,10 @@ void handleResponse(WebResponse response) {
   } else if (response.pattern == "MARQUEE") {
     deviceSettings.pattern = Marquee;
     light->changePattern(new MarqueePattern(light, deviceSettings.startColor, deviceSettings.endColor, deviceSettings.speed));
+    settingsChanged = true;
+  } else if (response.pattern == "BREATHING") {
+    deviceSettings.pattern = Breathing;
+    light->changePattern(new BreathingPattern(light, deviceSettings.startColor, deviceSettings.speed));
     settingsChanged = true;
   }
 

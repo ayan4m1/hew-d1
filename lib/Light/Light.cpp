@@ -99,6 +99,23 @@ void GradientPattern::draw() {
   }
 }
 
+void BreathingPattern::draw() {
+  Log::log("Step is %d/%d, direction %s", currentStep, maximumSteps, direction ? "true": "false");
+  uint8_t easedStep = ease8InOutCubic((currentStep / (double)maximumSteps) * 0xFFU);
+  CRGB blendedColor = blend(startColor, endColor, easedStep);
+  light->setColor(blendedColor);
+
+  if (!direction) {
+    currentStep++;
+  } else {
+    currentStep--;
+  }
+
+  if (currentStep == maximumSteps || currentStep == 0) {
+    direction = !direction;
+  }
+}
+
 Light::Light() {
   config = LightConfig();
   config.ledCount = HEW_LED_COUNT;
